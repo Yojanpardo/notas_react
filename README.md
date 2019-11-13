@@ -244,6 +244,223 @@ let suma = sumar(...numeros);
 Cuando queremos hacer una operación con arreglos debemos fijarnos si ya tienen un método que haga lo que requerimos, como por ejemplo los siguiente:
 
 ~~~js
-//Tenemos un arreglo de personas que loce de la siguiente manera
+//Tenemos un arreglo de personas que luce de la siguiente manera
+let personas = [
+    {nombre:'yojan',edad:23,carrera:'desarrollo web'},
+    {nombre:'jhon',edad:22,carrera:'desarrollo backden'},
+    {nombre:'felipe',edad:23,carrera:'desarrollo backend'},
+    {nombre:'william',edad:24,carrera:'analisis de datos'},
+    {nombre:'laura',edad:22,carrera:'diseño ui/ux'},
+]
 
+//Tenemos un metodo que nos permite filtrar un arreglo como lo deseemos
+personas.filter(persona=>{
+    return persona.edad >=23;
+});
+
+//Si queremos encontrar un único registro
+personas.filter(persona=>{
+    return persona.nombre === 'laura';
+});
+
+//Si queremos encontrar sumar algun dato
+personas.reduce((edadTotal,persona)=>{
+    return edadTotal + persona.edad;
+}, 0);
 ~~~
+
+## Promises
+Nos ayudan a comprender mejor el código cuando hacemos, por ejemplo, un llamado asicrono a una API o rn cualquier otro caso
+
+~~~js
+const aplicarDescuento= new Promise((resolve,reject)=>{
+    setTimeout(() =>{
+        let descuento = true;
+        if(descuento){
+            resolve('descuento aplicado');
+        } else{
+            reject('descuento no aplicado');
+        }
+    },3000);
+});
+
+aplicarDescuento.then(resultado => {
+    console.log(resultado);
+}).catch(error => {
+    console.log(error);
+});
+~~~
+
+### Promises con Ajax
+Una petición Ajax consta de 3 o 4 pasos que son los siguientes:  
+1. crear el llamado
+2. abrir la conexión
+3. enviar los datos
+4. error  
+
+Lo veremos acontinuación en el siguiente ejemplo el cual hace un llamado a una API para descargar una lista de usuarios.
+
+~~~js
+const descargarUsuarios = cantidad => new Promise((resolve, reject) => {
+    //Le pasamos la cantidad de usuarios que vamos a descargar a la API 
+    const api = `https://randomuser.me/api/?results=${cantidad}&nat=us`;
+
+    //llamado Ajax
+    const xhr = new XMLHttpRequest();
+
+    //Abrir la conexión
+    xhr.open('GET', api, true);
+
+    //on load
+    xhr.onload = () => {
+        //Por lo general se revisa la carga por medio del estado
+        if(xhr.status === 200){
+            resolve(JSON.parse(xhr.responseText).results);
+        }else{
+            reject(Error(xhr.statusText));
+        }
+    }
+
+    //Opcional on error
+    xhr.onerror = (error) => reject(error);
+
+    //enviar
+    xhr.send();
+});
+
+//vamos a imprimir el resultado en nuestro html
+
+descargarUsuarios(30).then(
+    miembros => imprimirHtml(miembros),
+    error => console.error(
+        new Error (`Hubo un error: ${error}`)
+    )
+);
+
+function imprimirHtml(miembros){
+    let app = document.querySelector("#app");
+    let html = `<ul>`;
+    miembros.forEach(miembro => {
+        html += `
+            <li> 
+                Nombre: ${miembro.name.first} ${miembro.name.last}
+                Género: ${miembro.gender}
+                Imagen: <img src="${miembro.picture.thumbnail}">
+            </li>
+        `;
+    });
+    html += `</ul>`;
+    app.innerHTML = html;
+}
+~~~
+
+## Programación orientada a objetos
+En React debemos escribir todo nuestro código con clases y para ello es importante conocer lo que es la programació orientada a objetos 
+
+~~~js
+class Tarea(){
+    constructor(nombre, prioridad){
+        this.nombre = nombre;
+        this.prioridad = prioridad;
+    }
+    imprimir(){
+        return `la tarea ${this.nombre} tiene una prioridad ${prioridad}`;
+    }
+}
+~~~
+
+### Herencia 
+La herencia nos permite tomar los atributos y comportamientos de una clase padre y extenderla hacia sus clases hijas, esto nos ayuda a reducir mucho el código y tenerlo mucho más organizado.  
+En React se utiliza mucho la herencia, asi como en todos los frameworks, vamos a ver un poco de herencia acontinuación  
+
+~~~js
+//vamos a heredar de nuestro ejemplo anterior y lo hacemos de la siguiente manera 
+class comprasPendientes() extends Tarea {
+    constructor(nombre, prioridad, cantidad){
+        super(nombre,prioridad);
+        this.cantidad = cantidad;
+    }
+    
+    //puedo sobreescribir los métodos ya existentes
+    mostrar(){
+        super.mostrar();
+        console.log(`cantidad: ${this.cantidad}`);
+    }
+    
+    //Y crear nuevos métodos
+    hola(){
+        console.log('hola');
+    }
+}
+~~~
+
+### Módulos
+JS nos permite tener nuestro código bien segmentado y ordenado haciendo uso de módulos, gracias a ellos podemos importar variables, funciones y clases de otros archivos de JS.  
+
+Entonces tenemos nuestro index.html dentro del cual vamos a llamar a nuestro archivo JS pero con la particularidad de que le vamos a agregar un atributo que se llama `type` y como valor le damos `module`
+
+~~~html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Aprendiendo ReactJS</title>
+</head>
+<body>
+    <h1>Repasando javascript</h1>
+    <div id="app">
+
+    </div>
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>
+~~~
+
+Nuestro archivo `js/app.js` va a ser nuestro archivo principal, el cual contiene todos los módulos y va a verse más o menos así
+
+~~~js
+import {nombreTarea, crearTarea} from './tareas.js';
+//Aquí ya podremos hacer uso de la variable 'nombreTarea' y del método crearTarea dentro de este archivo.
+~~~
+
+Nuestro archivo `tarea.js` va a lucir así 
+
+~~~js
+export const nombreTarea = 'pasear al perro';
+export const crearTarea = (nombre, prioridad) =>{
+    return `tarea: ${nombre}, prioridad: ${prioridad}`;
+}
+~~~
+
+Si queremos exportar clases lo hariamos de la misma manera, a demás si queremos incluir una clase hija, primero a esa clase hijua hay que importarle la clase padre y luego exportarla
+
+~~~js
+export default class Tarea{
+    constructor(nombre, prioridad){
+        this.nombre = nombre;
+        this.prioridad = prioridad;
+    }
+    mostrar(){
+        return `tarea: ${this.tarea}, prioridad: ${this.prioridad}`
+    }
+}
+~~~
+
+Y por ejemplo en otro archivo tenemos otra clase que hereda de Tarea
+
+~~~js
+import Tarea from './tarea.js';
+
+export default class listaCompras() extends Tarea{
+    constructor(nombre, prioridad, cantidad){
+        super(nombre, prioridad);
+        this.cantidad = cantidad;
+    }
+}
+~~~
+
+## Conclusiones
+Con esto terminamos el repaso de javascript y nos podemos dar cuenta de que hay muchas cosas que podemos utilizar con javascript y quizas no recordabamos, acontinuación continuaremos con la introducción a react y como instalarlo.
+
