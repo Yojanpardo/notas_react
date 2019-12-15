@@ -464,3 +464,45 @@ export default class listaCompras() extends Tarea{
 ## Conclusiones
 Con esto terminamos el repaso de javascript y nos podemos dar cuenta de que hay muchas cosas que podemos utilizar con javascript y quizas no recordabamos, acontinuación continuaremos con la introducción a react y como instalarlo.
 
+# React
+Una vez terminado nuestro repaso de JavaScript, vamos a iniciar con React, todo lo que tiene que ver con su instalación y funcionamiento
+
+## Instalación
+Para instalar react primero debemos tenert instalado npm, que es el manejador de paquetes de node, yo utilizo ubuntu, entonces para hacer la instalación de react abrimos una terminal y primero que todo vamos a instalar npm y luego create-react-app
+
+~~~sh
+#Instalamos npm en su ultima versión
+sudo apt install npm
+
+#Luego instalamos create-react-app de forma global
+sudo npm install -g create-react-app
+
+#y para crear una nueva aplicación de react lo hacemos con el siguiente comando
+create-react-app <my_app>
+cd <my_app>
+npm start
+~~~  
+
+de esta manera ya hemos instalado react, hemos creado nuestra app y la hemos iniciado.
+
+## React components
+React cuenta con los "componentes" que son bloques de código que nos ayudan a optimizar nuestro trabajo permitiendonos reutilizar los componentes donde los requiramos, existen dos tipos de componoentes que son:
+
+### Class component
+deben tener un método render que retorna lo que requerimos
+~~~js
+class App extends Component{
+    render(){
+        return(
+            <p>Hola mundo</p>
+        )
+    }
+}
+~~~
+### Functional component
+Es más pequeño que los class component, es muy facil de crear y leer, facil de hacer testing, no se puede usar la palabra this, se dice que tiene mejor perfomance y sus desventajas: no se pueden usar los componentes del ciclo de vida, no tienen states, no pueden usar refs, en caso de usar alguno de estos 3, es necesario usar un class component.
+~~~js
+const app = props =>(
+    <p>Hola mundo</p>
+);
+~~~
